@@ -1,16 +1,12 @@
-/**
- *  @author Luca Pietro Borsani
- */
+#ifndef BRACELET_H
+#define BRACELET_H
 
-#ifndef SENDACK_H
-#define SENDACK_H
-
-//payload of the msg
-typedef nx_struct my_msg {
-	nx_uint8_t type;
-	nx_uint16_t data;
-	nx_uint8_t counter;
-} my_msg_t;
+//info messagge contain state coord x coord y
+typedef nx_struct info_msg {
+	double x;
+	double y;
+	nx_uint8_t status;
+} info_msg_t;
 
 
 typedef nx_struct my_msg_keyt {
@@ -23,8 +19,11 @@ typedef nx_struct my_msg_nextt {
 	nx_uint8_t next;
 } my_msg_next;
 
-#define REQ 1
-#define RESP 2 
+ 
+#define STANDING 1
+#define WALKING 2
+#define RUNNING 3
+#define FALLING 4
 
 enum{
 AM_MY_MSG = 6,

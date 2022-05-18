@@ -25,7 +25,8 @@ module BraceletsC {
 
 } implementation {
 
-  uint8_t counter=0;
+  double last_x;
+  double last_y;
   uint8_t phase = 0;
   uint8_t sendAddress;
   uint8_t locked = 0;
@@ -146,7 +147,6 @@ module BraceletsC {
       if(phase == 1) {
       	phase = 2;
       	dbgerror("radio_send", "Special packet acked!\n");
-      	call MilliTimer.stop();
       }
       
       
@@ -186,7 +186,7 @@ module BraceletsC {
 				dbg("radio_send", "Device succesfully paired with %d! Passing to next step\n", msg->sendAddress); 
 				phase = 1; //next phase
 				sendAddress = msg->sendAddress; //storing the address of the sending mote
-				//call MilliTimer.stop();
+				call MilliTimer.stop();
 				sendNextStep();
 			}
 
