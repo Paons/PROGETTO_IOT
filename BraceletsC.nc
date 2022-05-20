@@ -26,8 +26,8 @@ module BraceletsC {
 
 } implementation {
 
-  double last_x;
-  double last_y;
+  uint32_t last_x;
+  uint32_t last_y;
   uint8_t phase = PARING;
   uint8_t sendAddress;
   uint8_t locked = 0;
@@ -48,7 +48,7 @@ module BraceletsC {
   
   if(!locked){
   	
-	  my_msg_key* msg = (my_msg_key*)(call Packet.getPayload(&packet, sizeof(my_msg_key)));
+	  my_msg_key_t* msg = (my_msg_key_t*)(call Packet.getPayload(&packet, sizeof(my_msg_key_t)));
 	  if (msg == NULL) {
 		return;
 	  }
@@ -71,7 +71,7 @@ module BraceletsC {
 	  //call PacketAcknowledgements.requestAck( &packet );
 	  if(type == PARING){
 	  
-	  if(call AMSend.send(AM_BROADCAST_ADDR, &packet,sizeof(my_msg_key)) == SUCCESS){
+	  if(call AMSend.send(AM_BROADCAST_ADDR, &packet,sizeof(my_msg_key_t)) == SUCCESS){
 	     dbg("radio_send", "Packet for pairing passed to lower layer successfully!\n"); 
 	     locked = 1;
   	  }	
@@ -80,7 +80,7 @@ module BraceletsC {
   	  else{
   	  
   	  call PacketAcknowledgements.requestAck( &packet );
-	  if(call AMSend.send(sendAddress, &packet,sizeof(my_msg_key)) == SUCCESS){
+	  if(call AMSend.send(sendAddress, &packet,sizeof(my_msg_key_t)) == SUCCESS){
 	     dbg("radio_send", "Packet for next step passed to lower layer successfully!\n"); 
 	     locked = 1;
   	  }	
@@ -179,11 +179,10 @@ module BraceletsC {
 
   event message_t* Receive.receive(message_t* buf,void* payload, uint8_t len) {
 		
-	my_msg_key* msg = (my_msg_key*)payload;
-	
-	switch (len){
     
-    case sizeof(my_msg_key): //#comment può essere sia broadcast o unicast (PARING || NEXTSTEP) 
+    if (len == sizeof(my_msg_key_t)){ //#comment può essere sia broadcast o unicast (PARING || NEXTSTEP) 
+    	
+    	my_msg_key_t* msg = (my_msg_key_t*)payload;
     	
     	 //#comment riceviamo un messaggio di tipo paring c'è solo un caso se siamo in paring mode ok se siamo in next mode non ci serve siamo a posto
     	
@@ -199,7 +198,7 @@ module BraceletsC {
 				sendKey(NEXTSTEP);
     	
     			}
-   			 	else if(pahse==NEXTSTEP && msg->type == NEXTSTEP){ //#comment se siamo in next step e riceviamo un nextstep andiamo in operating viceversa se riceviamo l'ack e siamo in nextstep 
+   			 	else if(phase==NEXTSTEP && msg->type == NEXTSTEP){ //#comment se siamo in next step e riceviamo un nextstep andiamo in operating viceversa se riceviamo l'ack e siamo in nextstep 
    			 	phase = OPERATING;
    			 	if(TOS_NODE_ID %2 == 0)	call Timer2.startPeriodic( 10000 ); //10 sec
    			 	else call Timer1.startPeriodic( 60000 ); // 60 sec 
@@ -210,9 +209,11 @@ module BraceletsC {
 			else{ // #comment caso anormale perché ci sono +4 nodi
 				//dbg("radio_send", "Pairing error\n"); 
 			}
-    	break;
+    	}
  
-    case sizeof(my_info_msg): //#comment se riceviamo un messaggio di tipo info controlliamo se contiene falling chiamiamo una funzione alert(FALLING) che fa qualcosa se no facciamo il display normale dello stato?
+   else if (len == sizeof(my_info_msg_t)){ //#comment se riceviamo un messaggio di tipo info controlliamo se contiene falling chiamiamo una funzione alert(FALLING) che fa qualcosa se no facciamo il display normale dello stato?
+		
+		my_info_msg_t* msg = (my_info_msg_t*)payload;
 		
 		if(TOS_NODE_ID%2 != 0){
 		last_x=msg->x;
@@ -222,32 +223,30 @@ module BraceletsC {
   		
 		//dbg.....
 		}
-    	break;
+    	
+    	}
     
-    default: 
+    else{
     	dbgerror("radio_rec", "Receiving error \n");
-    	break;
-    } 
-	
+	}
 	return buf;
-	
     
   }
 
   event void Read.readDone(error_t result, uint16_t data) {
 
-	  my_info_msg* msg = (my_info_msg*)(call Packet.getPayload(&packet, sizeof(my_info_msg)));
+	  my_info_msg_t* msg = (my_info_msg_t*)(call Packet.getPayload(&packet, sizeof(my_info_msg_t)));
 	  if (msg == NULL || result != SUCCESS) {
 		return;
 	  }
 	   
-	  msg->x = 38.946875 ;
-	  msg->y = 16.641260;
+	  msg->x = 38946875 ;
+	  msg->y = 16641260;
 	  msg->status = data;
 	  
 	  call PacketAcknowledgements.requestAck(&packet);
 	  
-	  if(call AMSend.send(1, &packet,sizeof(my_msg_t)) == SUCCESS){
+	  if(call AMSend.send(1, &packet,sizeof(my_info_msg_t)) == SUCCESS){
 	     dbg("radio_send", "Packet passed to lower layer successfully!\n");
 	     //dbg("radio_pack",">>>Pack\n \t Payload length %hhu \n", call Packet.payloadLength( &packet ) );
 	     //dbg_clear("radio_pack","\t Payload Sent\n" );

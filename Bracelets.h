@@ -2,18 +2,18 @@
 #define BRACELET_H
 
 //info messagge contain state coord x coord y
-typedef nx_struct info_msgt {
-	double x;
-	double y;
+typedef nx_struct my_info_msg {
+	nx_uint32_t x;
+	nx_uint32_t y;
 	nx_uint8_t status;
-} my_info_msg;
+} my_info_msg_t;
 
 
-typedef nx_struct my_msg_keyt {
+typedef nx_struct my_msg_key {
 	nx_uint8_t type;	
 	nx_uint8_t sendAddress;
 	nx_uint8_t key[21];
-} my_msg_key;
+} my_msg_key_t;
 
 
 //statuts of child
