@@ -26,6 +26,8 @@ typedef nx_struct my_msg_key {
 #define NEXTSTEP 1
 #define OPERATING 2
 
+#define MISSING 5
+
 enum{
 AM_MY_MSG = 6,
 };
