@@ -117,9 +117,24 @@ for i in range(1, 5):
     t.getNode(i).createNoiseModel()
 
 print "Start simulation with TOSSIM! \n\n\n";
-
+'''
 for i in range(0,1200):
 	t.runNextEvent()
-	
+'''
+
+node2off = False;
+
+simtime = t.time();
+while (t.time() < simtime + (200 * t.ticksPerSecond())):
+	t.runNextEvent()
+	if(node2off == False):
+		if (t.time() >= (40 * t.ticksPerSecond())):  #at 30s we put the node out of range by turning it off
+			node2.turnOff()
+			node2Off = True
+
+
+
+
+
 print "\n\n\nSimulation finished!";
 
