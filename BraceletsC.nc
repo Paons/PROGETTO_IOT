@@ -215,7 +215,9 @@ module BraceletsC {
    			 	if(TOS_NODE_ID %2 == 0)	call Timer2.startPeriodic( 10000 ); //10 sec
    			 	else call Timer1.startPeriodic( 60000 ); // 60 sec 
     	
-  			  	} 	
+  			  	}
+  			  	else if (phase == OPERATING && msg->type == PARING)  //when the child bracelet return into the range
+  			  		sendKey(NEXTSTEP); 	
 				
 			}
 			else{ // #comment caso anormale perché ci sono +4 nodi
