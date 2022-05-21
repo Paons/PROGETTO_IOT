@@ -15,12 +15,6 @@ typedef nx_struct my_msg_key {
 	nx_uint8_t key[21];
 } my_msg_key_t;
 
-typedef struct sensor {
-	uint32_t x;	
-	uint32_t y;
-	uint8_t status;
-} sensor_status_t;
-
 
 //statuts of child
 #define STANDING 1
@@ -31,8 +25,6 @@ typedef struct sensor {
 #define PARING 0
 #define NEXTSTEP 1
 #define OPERATING 2
-
-#define MISSING 5
 
 enum{
 AM_MY_MSG = 6,
